@@ -15,6 +15,19 @@ from sopel.config.types import FilenameAttribute, StaticSection, ValidatedAttrib
 # Time in seconds, that the bot reloads network metrics
 INTERVAL_UPDATE = 60
 
+# Colored prefix
+#   \x03AA,BB
+#   AA = foreground color
+#   BB = background color
+#   ,BB can be omitted
+#
+#   For more information
+#   https://github.com/myano/jenni/wiki/IRC-String-Formatting
+#   http://www.mirc.co.uk/colors.html
+COLOR_NETWORK = '\x0307' # orange
+COLOR_RESET   = '\x0F'
+COLOR_PREFIX  = '[%snet%s]' % (COLOR_NETWORK, COLOR_RESET)
+
 
 class NetworkSection(StaticSection):
     cache_file = FilenameAttribute('cache_file', default='network_cache.json')
@@ -29,7 +42,7 @@ def setup(bot):
 def cache_read(bot):
     cache_file = bot.config.network.cache_file
     if not os.path.isfile(cache_file):
-        bot.say('Cache file does not exist.')
+        bot.say('%s Cache file does not exist.' % COLOR_PREFIX)
         return
 
     with open(cache_file) as json_file:
@@ -41,7 +54,7 @@ def cache_read(bot):
 def cache_write(bot, cache):
     cache_file = bot.config.network.cache_file
     if not os.path.isfile(cache_file):
-        bot.say('Cache file does not exist.')
+        bot.say('%s Cache file does not exist.' % COLOR_PREFIX)
         return
 
     with open(cache_file, 'w') as json_file:
@@ -56,7 +69,7 @@ def update_metrics(bot, force=False):
 
     meshviewer_file = bot.config.network.meshviewer_file
     if not os.path.isfile(meshviewer_file):
-        bot.say('Meshviewer file does not exist.')
+        bot.say('%s Meshviewer file does not exist.' % COLOR_PREFIX)
         return
 
     with open(meshviewer_file) as json_file:
@@ -84,13 +97,13 @@ def update_metrics(bot, force=False):
         nodes_max = nodes_online
     else:
         nodes_max = cache['nodes']['max']
-        bot.say("New maximum nodes: %s" % nodes_max, announce_channel)
+        bot.say("%s New maximum nodes: %s" % (COLOR_PREFIX, nodes_max), announce_channel)
 
     if client_count > cache['clients']['max']:
         clients_max = client_count
     else:
         clients_max = cache['clients']['max']
-        bot.say("New maximum clients: %s" % clients_max, announce_channel)
+        bot.say("%s New maximum clients: %s" % (COLOR_PREFIX, clients_max), announce_channel)
 
     cache_new = {}
 
@@ -118,7 +131,7 @@ def current(bot, trigger):
     cache = cache_read(bot)
     nodes_current = cache['nodes']['current']
     clients_current = cache['clients']['current']
-    bot.say('Current: %s nodes, %s clients' % (nodes_current, clients_current))
+    bot.say('%s Current: %s nodes, %s clients' % (COLOR_PREFIX, nodes_current, clients_current))
 
 
 @module.commands('maximum')
@@ -127,4 +140,4 @@ def maximum(bot, trigger):
     cache = cache_read(bot)
     nodes_max = cache['nodes']['max']
     clients_max = cache['clients']['max']
-    bot.say('Maximum: %s nodes, %s clients' % (nodes_max, clients_max))
+    bot.say('%s Maximum: %s nodes, %s clients' % (COLOR_PREFIX, nodes_max, clients_max))
