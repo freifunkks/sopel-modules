@@ -9,7 +9,7 @@ import os
 
 from sopel import module
 from sopel.module import interval
-from sopel.config.types import FilenameAttribute, StaticSection
+from sopel.config.types import FilenameAttribute, StaticSection, ValidatedAttribute
 
 
 # Time in seconds, that the bot reloads network metrics
@@ -19,6 +19,7 @@ INTERVAL_UPDATE = 60
 class NetworkSection(StaticSection):
     cache_file = FilenameAttribute('cache_file', default='network_cache.json')
     meshviewer_file = FilenameAttribute('meshviewer_file', default='/home/ffks-map/meshviewer/build/data/nodes.json')
+    announce_channel = ValidatedAttribute('announce_channel', default='#ffks')
 
 
 def setup(bot):
@@ -35,6 +36,16 @@ def cache_read(bot):
         cache = json.load(json_file)
 
     return cache
+
+
+def cache_write(bot, cache):
+    cache_file = bot.config.network.cache_file
+    if not os.path.isfile(cache_file):
+        bot.say('Cache file does not exist.')
+        return
+
+    with open(cache_file, 'w') as json_file:
+        json.dump(cache, json_file)
 
 
 @interval(INTERVAL_UPDATE)
@@ -67,9 +78,31 @@ def update_metrics(bot, force=False):
             pass
 
     cache = cache_read(bot)
+    announce_channel = bot.config.network.announce_channel
 
-    print("Nodes online: %s"   % nodes_online)
-    print("Clients online: %s" % client_count)
+    if nodes_online > cache['nodes']['max']:
+        nodes_max = nodes_online
+    else:
+        nodes_max = cache['nodes']['max']
+        bot.say("New maximum nodes: %s" % nodes_max, announce_channel)
+
+    if client_count > cache['clients']['max']:
+        clients_max = client_count
+    else:
+        clients_max = cache['clients']['max']
+        bot.say("New maximum clients: %s" % clients_max, announce_channel)
+
+    cache_new = {}
+
+    cache_new['clients'] = {}
+    cache_new['clients']['max'] = clients_max
+    cache_new['clients']['current'] = client_count
+
+    cache_new['nodes'] = {}
+    cache_new['nodes']['max'] = nodes_max
+    cache_new['nodes']['current'] = nodes_online
+
+    cache_write(bot, cache_new)
 
 
 @module.commands('status')
