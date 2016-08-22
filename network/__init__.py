@@ -18,6 +18,7 @@ INTERVAL_UPDATE = 60
 
 class NetworkSection(StaticSection):
     cache_file = FilenameAttribute('cache_file', default='network_cache.json')
+    meshviewer_file = FilenameAttribute('meshviewer_file', default='/home/ffks-map/meshviewer/build/data/nodes.json')
 
 
 def setup(bot):
@@ -29,15 +30,46 @@ def cache_read(bot):
     if not os.path.isfile(cache_file):
         bot.say('Cache file does not exist.')
         return
+
     with open(cache_file) as json_file:
         cache = json.load(json_file)
+
     return cache
 
 
 @interval(INTERVAL_UPDATE)
 def update_metrics(bot, force=False):
-    # TODO Read metrics via http/file
-    print("test")
+    """Load metrics from meshviewer_file and update values in cache_file"""
+    # Partly grabbed from here:
+    # https://github.com/freifunkks/salt-conf/blob/master/state/graphite/ffks-nodestats.py
+
+    meshviewer_file = bot.config.network.meshviewer_file
+    if not os.path.isfile(meshviewer_file):
+        bot.say('Meshviewer file does not exist.')
+        return
+
+    with open(meshviewer_file) as json_file:
+        data = json.load(json_file)
+    nodes = data['nodes']
+    nodes_online = 0
+    client_count = 0
+
+    for node_mac, node in nodes.items():
+        try:
+            if node['flags']['online']:
+                nodes_online += 1
+        except KeyError:
+            pass
+        try:
+            clients = node['statistics']['clients']
+            client_count += int(clients)
+        except KeyError:
+            pass
+
+    cache = cache_read(bot)
+
+    print("Nodes online: %s"   % nodes_online)
+    print("Clients online: %s" % client_count)
 
 
 @module.commands('status')
