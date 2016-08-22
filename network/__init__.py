@@ -93,13 +93,13 @@ def update_metrics(bot, force=False):
     cache = cache_read(bot)
     announce_channel = bot.config.network.announce_channel
 
-    if nodes_online > cache['nodes']['max']:
+    if nodes_online >= cache['nodes']['max']:
         nodes_max = nodes_online
     else:
         nodes_max = cache['nodes']['max']
         bot.say("%s New maximum nodes: %s" % (COLOR_PREFIX, nodes_max), announce_channel)
 
-    if client_count > cache['clients']['max']:
+    if client_count >= cache['clients']['max']:
         clients_max = client_count
     else:
         clients_max = cache['clients']['max']
