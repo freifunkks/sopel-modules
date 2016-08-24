@@ -6,6 +6,7 @@ RecentChanges action page.
 
 import json
 import os
+import re
 import requests
 
 from sopel import module
@@ -15,6 +16,7 @@ from sopel.config.types import FilenameAttribute, StaticSection, ValidatedAttrib
 try:
     import xml.etree.cElementTree as et
 except ImportError:
+    print("cElementTree not found. Using slower Python implementation 'ElementTree' instead.")
     import xml.etree.ElementTree as et
 
 
@@ -31,6 +33,7 @@ INTERVAL_UPDATE = 60
 #   https://github.com/myano/jenni/wiki/IRC-String-Formatting
 #   http://www.mirc.co.uk/colors.html
 COLOR_NETWORK = '\x0306' # magenta
+COLOR_BOLD    = '\x02'
 COLOR_RESET   = '\x0F'
 COLOR_PREFIX  = '[%sweb%s]' % (COLOR_NETWORK, COLOR_RESET)
 
@@ -85,4 +88,46 @@ def check_recent_changes(bot, force=False):
     if changes_old == "":
         bot.say("{} No cached recent changes yet".format(COLOR_PREFIX), announce_channel)
 
+    # No change detected, no need for comparisons
+    if changes_new == changes_old:
+        return
+
+    items_new = parse_xml(changes_new)
+    items_old = parse_xml(changes_old)
+
+    for item in items_new:
+        if item in items_old:
+            continue
+        bot.say("{} {}{}{} updated by {}:".format(COLOR_PREFIX,
+                 COLOR_BOLD,
+                 item['title'],
+                 COLOR_RESET,
+                 item['author']), announce_channel)
+        bot.say("      {}".format(item['url']), announce_channel)
+
     cache_write(bot, changes_new)
+
+# Parses MoinMoin's RSS XML structure and gives back a list of dicts with the
+# following elements:
+#   author
+#   date
+#   title
+#   url
+def parse_xml(xml_string):
+    tree = et.fromstring(xml_string)
+    items = []
+
+    for item in tree.findall("{http://purl.org/rss/1.0/}item"):
+        author = item.find("{http://purl.org/dc/elements/1.1/}contributor").find("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}Description").find("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}value").text
+        date = item.find("{http://purl.org/dc/elements/1.1/}date").text
+        title = item.find("{http://purl.org/rss/1.0/}title").text
+        url = item.find("{http://purl.org/rss/1.0/}link").text
+
+        author = re.sub(r"Self:(.+)", r"\1", author)
+
+        items.append({"author":author,
+                      "date":date,
+                      "title":title,
+                      "url":url})
+
+    return items
