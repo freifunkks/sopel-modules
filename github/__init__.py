@@ -41,6 +41,7 @@ bot_global = None
 
 class GithubSection(StaticSection):
     announce_channel = ValidatedAttribute('announce_channel', default='#ffks')
+    announce_commit_messages = ValidatedAttribute('announce_commit_messages ', bool, default=True)
     webhook_secret = ValidatedAttribute('webhook_secret', default='YOUMUSTCHANGETHIS')
     webhook_port = ValidatedAttribute('webhook_port', int, default=3333)
 
@@ -130,6 +131,10 @@ def handle_push_event(data):
              "s" if (len(data['commits']) > 1) else "",
              data['pusher']['name'],
              url))
+
+    if bot_global.config.github.announce_commit_messages:
+        for commit in data['commits']:
+            bot_say("      {}".format(commit['message']))
 
 
 def handle_issue_event(data):
