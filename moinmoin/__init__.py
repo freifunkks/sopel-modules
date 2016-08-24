@@ -12,7 +12,10 @@ from sopel import module
 from sopel.module import interval
 from sopel.config.types import FilenameAttribute, StaticSection, ValidatedAttribute
 
-import xml.etree.ElementTree as et
+try:
+    import xml.etree.cElementTree as et
+except ImportError:
+    import xml.etree.ElementTree as et
 
 
 # Time in seconds, that the bot reloads network metrics
