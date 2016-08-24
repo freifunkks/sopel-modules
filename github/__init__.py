@@ -9,10 +9,12 @@ user/organization.
 import hashlib
 import hmac
 import json
+import re
 import requests
 import sopel
 
 from flask import Flask, request, abort
+from pprint import pprint
 from sopel import module
 from sopel.config.types import FilenameAttribute, StaticSection, ValidatedAttribute
 from thread import start_new_thread
@@ -97,20 +99,33 @@ def webhook():
 
 def handle_repository_event(data):
     url = github_shortify(data['repository']['html_url'])
-    bot_say("{} {} {} {}  repository: {}".format(COLOR_PREFIX,
-             data['sender']['login'],
+    bot_say("{} Repo {}{}{} {} by {}: {}".format(COLOR_PREFIX,
+             COLOR_BOLD,
+             data['repository']['name'],
+             COLOR_RESET,
              data['action'],
-             data['repository']['full_name'],
+             data['sender']['login'],
              url))
 
 
 def handle_push_event(data):
+    # Zero commits, e.g. when branch was deleted
+    if len(data['commits']) < 1:
+        return
     url = github_shortify(data['compare'])
-    bot_say("{} {}{}{}/{} {} commit{} pushed by {}: {}".format(COLOR_PREFIX,
+
+    # Omit default branch
+    branch = re.sub(r"[^/]+/[^/]+/([^/]+)", r"\1", data['ref'])
+    if branch == data['repository']['default_branch']:
+        branch = ""
+    else:
+        branch = "/{}".format(branch)
+
+    bot_say("{} {}{}{}{} {} commit{} pushed by {}: {}".format(COLOR_PREFIX,
              COLOR_BOLD,
              data['repository']['name'],
              COLOR_RESET,
-             data['repository']['master_branch'],
+             branch,
              len(data['commits']),
              "s" if (len(data['commits']) > 1) else "",
              data['pusher']['name'],
@@ -142,11 +157,41 @@ def handle_unimplemented_event(data, event):
 
 
 def handle_create_event(data):
-    bot_say("{} Create not yet implemented".format(COLOR_PREFIX))
+    ref_type = data['ref_type']
+    if ref_type == 'branch':
+        bot_say("{} Branch {}{}{}/{} created by {}".format(COLOR_PREFIX,
+                 COLOR_BOLD,
+                 data['repository']['name'],
+                 COLOR_RESET,
+                 data['ref'],
+                 data['sender']['login']))
+    else:
+        bot_say("{} 'create' action for '{}' not yet implemented".format(COLOR_PREFIX,
+                 ref_type))
+
+        # Debug
+        print("CREATE")
+        pprint(data)
+        print("\n\n\n")
 
 
 def handle_delete_event(data):
-    bot_say("{} Delete not yet implemented".format(COLOR_PREFIX))
+    ref_type = data['ref_type']
+    if ref_type == 'branch':
+        bot_say("{} Branch {}{}{}/{} deleted by {}".format(COLOR_PREFIX,
+                 COLOR_BOLD,
+                 data['repository']['name'],
+                 COLOR_RESET,
+                 data['ref'],
+                 data['sender']['login']))
+    else:
+        bot_say("{} 'create' action for '{}' not yet implemented".format(COLOR_PREFIX,
+                 ref_type))
+
+        # Debug
+        print("CREATE")
+        pprint(data)
+        print("\n\n\n")
 
 
 def github_shortify(url):
