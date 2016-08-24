@@ -72,8 +72,7 @@ def cache_write(bot, cache):
         xml_file.write(cache)
 
 
-#@interval(INTERVAL_UPDATE)
-@interval(10)
+@interval(INTERVAL_UPDATE)
 def check_recent_changes(bot, force=False):
     """Download recent changes xml file and print on diff with local cache"""
     announce_channel = bot.config.moinmoin.announce_channel
