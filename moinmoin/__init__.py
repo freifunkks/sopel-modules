@@ -41,7 +41,7 @@ COLOR_PREFIX  = '[%sweb%s]' % (COLOR_NETWORK, COLOR_RESET)
 class MoinMoinSection(StaticSection):
     cache_file = FilenameAttribute('cache_file', default='moinmoin_cache.xml')
     rss_url = ValidatedAttribute('rss_url', default='https://freifunk-kassel.de/action/rss_rc/RecentChanges?action=rss_rc&unique=1&ddiffs=1')
-    announce_channel = ValidatedAttribute('announce_channel', default='#ffks-test')
+    announce_channel = ValidatedAttribute('announce_channel', default='#ffks')
 
 
 def setup(bot):
