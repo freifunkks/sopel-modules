@@ -99,14 +99,22 @@ def webhook():
 
 
 def handle_repository_event(data):
-    url = github_shortify(data['repository']['html_url'])
-    bot_say("{} Repo {}{}{} {} by {}: {}".format(COLOR_PREFIX,
-             COLOR_BOLD,
-             data['repository']['name'],
-             COLOR_RESET,
-             data['action'],
-             data['sender']['login'],
-             url))
+    if data['action'] == "deleted":
+        bot_say("{} Repo {}{}{} {} by {}".format(COLOR_PREFIX,
+                 COLOR_BOLD,
+                 data['repository']['name'],
+                 COLOR_RESET,
+                 data['action'],
+                 data['sender']['login']))
+    else:
+        url = github_shortify(data['repository']['html_url'])
+        bot_say("{} Repo {}{}{} {} by {}: {}".format(COLOR_PREFIX,
+                 COLOR_BOLD,
+                 data['repository']['name'],
+                 COLOR_RESET,
+                 data['action'],
+                 data['sender']['login'],
+                 url))
 
 
 def handle_push_event(data):
