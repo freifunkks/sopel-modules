@@ -48,7 +48,7 @@ def status(bot, trigger):
 
     bot.say("{} Starting build for branch '{}'...".format(COLOR_PREFIX,
              branch), announce_channel)
-    ret = call([build_script])
+    ret = call([build_script, branch])
 
     # Build finished without errors
     if ret == 0:
