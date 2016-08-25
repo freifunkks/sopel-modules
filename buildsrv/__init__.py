@@ -5,6 +5,7 @@ Allows building new firmware and print information on builds' progress.
 
 from sopel import module
 from sopel.config.types import FilenameAttribute, StaticSection, ValidatedAttribute
+from subprocess import call
 
 # Colored prefix
 #   \x03AA,BB
@@ -22,8 +23,9 @@ COLOR_PREFIX  = '[%sbld%s]' % (COLOR_NETWORK, COLOR_RESET)
 
 
 class BuildServerSection(StaticSection):
-    bot_log = FilenameAttribute('cache_file', default='/tmp/sopel-build-gluon.log')
-    build_log = FilenameAttribute('cache_file', default='/tmp/build-gluon.log')
+    bot_log = FilenameAttribute('bot_log', default='/tmp/sopel-build-gluon.log')
+    build_log = FilenameAttribute('build_log', default='/tmp/build-gluon.log')
+    build_script = FilenameAttribute('build_script', default='/home/buildsrv/check-git-and-build.sh')
     announce_channel = ValidatedAttribute('announce_channel', default='#ffks-test')
 
 
@@ -37,10 +39,21 @@ def setup(bot):
 def status(bot, trigger):
     """Starts building all targets for given branch."""
     announce_channel = bot.config.buildsrv.announce_channel
+    build_script = bot.config.buildsrv.build_script
 
-    if len(trigger.groups()) < 2:
+    if trigger.group(2) == None:
         bot.say("{} Please enter a branch to be built".format(COLOR_PREFIX), announce_channel)
+        return
     branch = trigger.group(2)
 
-    bot.say("{} Starting build for branch '{}'".format(COLOR_PREFIX,
+    bot.say("{} Starting build for branch '{}'...".format(COLOR_PREFIX,
              branch), announce_channel)
+    ret = call([build_script])
+
+    # Build finished without errors
+    if ret == 0:
+        bot.say("{} All targets built successfully for branch '{}'".format(COLOR_PREFIX,
+                 branch), announce_channel)
+    else:
+        bot.say("{} Some target failed building for branch '{}'".format(COLOR_PREFIX,
+                 branch), announce_channel)
