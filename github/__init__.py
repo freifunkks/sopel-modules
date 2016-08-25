@@ -59,7 +59,7 @@ def shutdown(bot):
         func()
 
 
-@app.route('/webhook/', methods=['POST'])
+@app.route('/', methods=['POST'])
 def webhook():
     global bot_global
 
