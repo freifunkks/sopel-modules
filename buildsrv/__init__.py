@@ -4,6 +4,7 @@ Allows building new firmware and print information on builds' progress.
 """
 
 from sopel import module
+from sopel.config.types import FilenameAttribute, StaticSection, ValidatedAttribute
 
 # Colored prefix
 #   \x03AA,BB
