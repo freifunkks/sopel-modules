@@ -36,7 +36,7 @@ def setup(bot):
 @module.commands('build')
 def status(bot, trigger):
     """Starts building all targets for given branch."""
-    announce_channel = bot.config.moinmoin.announce_channel
+    announce_channel = bot.config.buildsrv.announce_channel
 
     if len(trigger.groups()) < 2:
         bot.say("{} Please enter a branch to be built".format(COLOR_PREFIX), announce_channel)
