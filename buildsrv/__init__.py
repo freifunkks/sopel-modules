@@ -37,7 +37,7 @@ class BuildServerSection(StaticSection):
     bot_log = FilenameAttribute('bot_log', default='/tmp/sopel-build-gluon.log')
     build_log = FilenameAttribute('build_log', default='/tmp/build-gluon.log')
     build_script = FilenameAttribute('build_script', default='/home/buildsrv/check-git-and-build.sh')
-    announce_channel = ValidatedAttribute('announce_channel', default='#ffks-test')
+    announce_channel = ValidatedAttribute('announce_channel', default='#ffks')
 
 
 def setup(bot):
