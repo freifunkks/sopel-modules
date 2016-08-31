@@ -37,6 +37,7 @@ COLOR_PREFIX  = '[%sgit%s]' % (COLOR_NETWORK, COLOR_RESET)
 
 app = Flask(__name__)
 bot_global = None
+flask_started = False
 
 
 class GithubSection(StaticSection):
@@ -47,10 +48,12 @@ class GithubSection(StaticSection):
 
 
 def setup(bot):
-    global app, bot_global
+    global app, bot_global, flask_started
     bot.config.define_section('github', GithubSection)
     bot_global = bot
-    start_new_thread(app.run,(),{'port': bot.config.github.webhook_port})
+    if not flask_started:
+        start_new_thread(app.run,(),{'port': bot.config.github.webhook_port})
+        flask_started = True
 
 
 def shutdown(bot):
