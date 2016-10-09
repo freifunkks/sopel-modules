@@ -69,7 +69,10 @@ def cache_write(bot, cache):
         return
 
     with open(cache_file, 'w') as xml_file:
-        xml_file.write(cache)
+        try:
+            xml_file.write(cache.decode('utf-8'))
+        except AttributeError:
+            xml_file.write(cache)
 
 
 @interval(INTERVAL_UPDATE)
