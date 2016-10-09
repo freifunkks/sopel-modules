@@ -14,7 +14,7 @@ import requests
 import sopel
 import threading
 
-from flask import Flask, request, abort
+from flask import Flask, abort
 from pprint import pprint
 from sopel import module
 from sopel.config.types import FilenameAttribute, StaticSection, ValidatedAttribute
@@ -68,6 +68,8 @@ def shutdown(bot):
 @app.route('/', methods=['POST'])
 def webhook():
     global bot_global
+    with app.test_request_context():
+        from flask import request
 
     event = request.headers.get('X-GitHub-Event')
     try:
