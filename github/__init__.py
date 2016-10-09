@@ -12,12 +12,12 @@ import json
 import re
 import requests
 import sopel
+import threading
 
 from flask import Flask, request, abort
 from pprint import pprint
 from sopel import module
 from sopel.config.types import FilenameAttribute, StaticSection, ValidatedAttribute
-from thread import start_new_thread
 
 
 # Colored prefix
@@ -52,7 +52,10 @@ def setup(bot):
     bot.config.define_section('github', GithubSection)
     bot_global = bot
     if not flask_started:
-        start_new_thread(app.run,(),{'port': bot.config.github.webhook_port})
+        threading.Thread(target=app.run,
+                         args=(),
+                         kwargs={'port': bot.config.github.webhook_port},
+                         ).start()
         flask_started = True
 
 
