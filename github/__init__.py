@@ -75,7 +75,10 @@ def webhook():
     try:
         webhook_secret = bot_global.config.github.webhook_secret
         hash_gh = request.headers.get('X-Hub-Signature')
-        digest = hmac.new(webhook_secret, "", hashlib.sha1)
+        try:
+            digest = hmac.new(webhook_secret.encode('utf-8'), "", hashlib.sha1)
+        except:
+            digest = hmac.new(webhook_secret, "", hashlib.sha1)
 
         digest.update(request.data)
         hash_calc = "sha1=" + digest.hexdigest()
