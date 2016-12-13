@@ -100,6 +100,8 @@ def webhook():
             handle_create_event(data)
         elif event == 'delete':
             handle_delete_event(data)
+        elif event == 'pull_request':
+            handle_pull_request_event(data)
         elif event == 'status':
             pass
         else:
@@ -217,6 +219,16 @@ def handle_delete_event(data):
         print("CREATE")
         pprint(data)
         print("\n\n\n")
+
+
+def handle_pull_request_event(data):
+    url = github_shortify(data['pull_request']['html_url'])
+    bot_say("{} [{}] {} {} pull request \"{}\": {}".format(COLOR_PREFIX,
+             data['repository']['name'],
+             data['pull_request']['user']['login'],
+             data['action'],
+             data['pull_request']['title'],
+             url))
 
 
 def github_shortify(url):
