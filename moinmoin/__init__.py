@@ -82,7 +82,6 @@ def check_recent_changes(bot, force=False):
 
     r = requests.get(bot.config.moinmoin.rss_url)
     if r.status_code != 200:
-        bot.say("{} Could not download recent changes".format(COLOR_PREFIX), announce_channel)
         return
 
     changes_new = r.text.encode('utf-8')
