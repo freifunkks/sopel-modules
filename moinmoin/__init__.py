@@ -87,7 +87,9 @@ def check_recent_changes(bot, force=False):
     changes_new = r.text.encode('utf-8')
     changes_old = cache_read(bot)
     if changes_old == "":
-        bot.say("{} No cached recent changes yet".format(COLOR_PREFIX), announce_channel)
+        cache_write(bot, changes_new)
+        return
+    #    bot.say("{} No cached recent changes yet".format(COLOR_PREFIX), announce_channel)
 
     # No change detected, no need for comparisons
     if changes_new == changes_old:
