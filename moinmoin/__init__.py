@@ -117,8 +117,13 @@ def check_recent_changes(bot, force=False):
 #   title
 #   url
 def parse_xml(xml_string):
-    tree = et.fromstring(xml_string)
     items = []
+    try:
+        tree = et.fromstring(xml_string)
+    except:
+        print("FIXME: broken xml")
+        return items
+
 
     for item in tree.findall("{http://purl.org/rss/1.0/}item"):
         author = item.find("{http://purl.org/dc/elements/1.1/}contributor").find("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}Description").find("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}value").text
