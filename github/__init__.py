@@ -34,6 +34,10 @@ COLOR_BOLD    = '\x02'
 COLOR_RESET   = '\x0F'
 COLOR_PREFIX  = '[%sgit%s]' % (COLOR_NETWORK, COLOR_RESET)
 
+IGNORED_EVENTS = {
+    'deployment',
+    'deployment_status',
+}
 
 app = Flask(__name__)
 bot_global = None
@@ -72,6 +76,10 @@ def webhook():
         from flask import request
 
     event = request.headers.get('X-GitHub-Event')
+
+    if event in IGNORED_EVENTS:
+        return "OK"
+
     try:
         webhook_secret = bot_global.config.github.webhook_secret
         hash_gh = request.headers.get('X-Hub-Signature')
