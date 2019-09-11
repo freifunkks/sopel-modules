@@ -37,6 +37,16 @@ COLOR_PREFIX  = '[%sgit%s]' % (COLOR_NETWORK, COLOR_RESET)
 IGNORED_EVENTS = {
     'deployment',
     'deployment_status',
+    'fork',
+    'member',
+    'page_build',
+    'pull_request_review',
+    'pull_request_review_comment',
+    'repository_vulnerability_alert',
+    'star',
+    'team',
+    'team_add',
+    'watch',
 }
 
 app = Flask(__name__)
