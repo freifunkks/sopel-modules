@@ -35,6 +35,8 @@ COLOR_RESET   = '\x0F'
 COLOR_PREFIX  = '[%sgit%s]' % (COLOR_NETWORK, COLOR_RESET)
 
 IGNORED_EVENTS = {
+    'check_run',
+    'check_suite',
     'deployment',
     'deployment_status',
     'fork',
