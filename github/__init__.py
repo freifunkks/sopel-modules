@@ -35,6 +35,8 @@ COLOR_RESET   = '\x0F'
 COLOR_PREFIX  = '[%sgit%s]' % (COLOR_NETWORK, COLOR_RESET)
 
 IGNORED_EVENTS = {
+    'check_run',
+    'check_suite',
     'deployment',
     'deployment_status',
     'fork',
@@ -106,24 +108,24 @@ def webhook():
             return "Failed", 403
 
         data = request.json
-        if event == 'push':
-            handle_push_event(data)
-        elif event == 'repository':
-            handle_repository_event(data)
+        if event == 'create':
+            handle_create_event(data)
+        elif event == 'delete':
+            handle_delete_event(data)
         elif event == 'issues':
             handle_issue_event(data)
         elif event == 'issue_comment':
             handle_issue_comment_event(data)
-        elif event == 'create':
-            handle_create_event(data)
-        elif event == 'delete':
-            handle_delete_event(data)
-        elif event == 'pull_request':
-            handle_pull_request_event(data)
-        elif event == 'status':
-            pass
         elif event == 'page_build':
             handle_page_build(data)
+        elif event == 'pull_request':
+            handle_pull_request_event(data)
+        elif event == 'push':
+            handle_push_event(data)
+        elif event == 'repository':
+            handle_repository_event(data)
+        elif event == 'status':
+            pass
         else:
             handle_unimplemented_event(data, event)
     except Exception as e:
