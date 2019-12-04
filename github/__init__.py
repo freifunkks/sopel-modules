@@ -51,6 +51,10 @@ IGNORED_EVENTS = {
     'watch',
 }
 
+IGNORED_KEYWORDS = {
+    'renovate',
+}
+
 app = Flask(__name__)
 bot_global = None
 flask_started = False
@@ -157,6 +161,11 @@ def handle_push_event(data):
     # Zero commits, e.g. when branch was deleted
     if len(data['commits']) < 1:
         return
+    # Filter bad words
+    for commit in data['commits']:
+        for k in IGNORED_KEYWORDS:
+            if k in commit['message']:
+                return
     url = github_shortify(data['compare'])
 
     # Omit default branch
@@ -244,6 +253,10 @@ def handle_delete_event(data):
 
 
 def handle_pull_request_event(data):
+    # Filter bad words
+    for k in IGNORED_KEYWORDS:
+        if k in data['pull_request']['user']['login']:
+            return
     url = github_shortify(data['pull_request']['html_url'])
     bot_say("{} [{}] {} {} pull request \"{}\": {}".format(COLOR_PREFIX,
              data['repository']['name'],
