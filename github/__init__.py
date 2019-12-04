@@ -40,6 +40,7 @@ IGNORED_EVENTS = {
     'deployment',
     'deployment_status',
     'fork',
+    'label',
     'member',
     'page_build',
     'pull_request_review',
