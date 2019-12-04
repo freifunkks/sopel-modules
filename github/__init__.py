@@ -52,6 +52,8 @@ IGNORED_EVENTS = {
 }
 
 IGNORED_KEYWORDS = {
+    'Docker digest',
+    'Docker tag',
     'renovate',
 }
 
