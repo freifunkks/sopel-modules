@@ -60,6 +60,10 @@ IGNORED_KEYWORDS = {
     'renovate',
 }
 
+IGNORED_NICK_PARTS = {
+    '[bot]',
+}
+
 app = Flask(__name__)
 bot_global = None
 flask_started = False
@@ -168,6 +172,9 @@ def handle_push_event(data):
         return
     # Filter bad words
     for commit in data['commits']:
+        for k in IGNORED_NICK_PARTS:
+            if k in commit['author']['name']:
+                return
         for k in IGNORED_KEYWORDS:
             if k in commit['message']:
                 return
@@ -220,6 +227,10 @@ def handle_unimplemented_event(data, event):
 
 
 def handle_create_event(data):
+    # Filter bad words
+    for k in IGNORED_NICK_PARTS:
+        if k in data['sender']['login']:
+            return
     ref_type = data['ref_type']
     if ref_type == 'branch':
         bot_say("{} Branch {}{}{}/{} created by {}".format(COLOR_PREFIX,
@@ -259,7 +270,7 @@ def handle_delete_event(data):
 
 def handle_pull_request_event(data):
     # Filter bad words
-    for k in IGNORED_KEYWORDS:
+    for k in IGNORED_NICK_PARTS:
         if k in data['pull_request']['user']['login']:
             return
     url = github_shortify(data['pull_request']['html_url'])
