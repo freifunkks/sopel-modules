@@ -64,6 +64,10 @@ IGNORED_NICK_PARTS = {
     '[bot]',
 }
 
+IGNORED_BRANCH_NAMES = {
+    'dependabot',
+}
+
 app = Flask(__name__)
 bot_global = None
 flask_started = False
@@ -230,6 +234,9 @@ def handle_create_event(data):
     # Filter bad words
     for k in IGNORED_NICK_PARTS:
         if k in data['sender']['login']:
+            return
+    for k in IGNORED_BRANCH_NAMES:
+        if k in data['ref']:
             return
     ref_type = data['ref_type']
     if ref_type == 'branch':
