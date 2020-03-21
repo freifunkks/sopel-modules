@@ -186,6 +186,8 @@ def handle_push_event(data):
         branch = ""
     else:
         branch = "/{}".format(branch)
+        # Cancel on non-default branch
+        return
 
     bot_say("{} {}{}{}{} {} commit{} pushed by {}: {}".format(COLOR_PREFIX,
              COLOR_BOLD,
