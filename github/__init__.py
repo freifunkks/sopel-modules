@@ -42,7 +42,6 @@ IGNORED_EVENTS = {
     'fork',
     'label',
     'member',
-    'page_build',
     'pull_request_review',
     'pull_request_review_comment',
     'repository_vulnerability_alert',
@@ -134,8 +133,6 @@ def webhook():
             handle_issue_event(data)
         elif event == 'issue_comment':
             handle_issue_comment_event(data)
-        elif event == 'page_build':
-            handle_page_build(data)
         elif event == 'push':
             handle_push_event(data)
         elif event == 'repository':
@@ -271,16 +268,6 @@ def handle_delete_event(data):
         print("CREATE")
         pprint(data)
         print("\n\n\n")
-
-
-def handle_page_build(data):
-    if data['build']['status'] != 'built':
-        return
-
-    bot_say("{} {} just deployed {}".format(COLOR_PREFIX,
-        data['pull_request']['user']['login'],
-        data['repository']['name']
-    ))
 
 
 def github_shortify(url):
