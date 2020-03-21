@@ -227,8 +227,7 @@ def handle_issue_comment_event(data):
 
 
 def handle_unimplemented_event(data, event):
-    bot_say("{} Unknown event: '{}'".format(COLOR_PREFIX,
-             event))
+    pass
 
 
 def handle_create_event(data):
