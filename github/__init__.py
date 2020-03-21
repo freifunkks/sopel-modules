@@ -136,8 +136,6 @@ def webhook():
             handle_issue_comment_event(data)
         elif event == 'page_build':
             handle_page_build(data)
-        elif event == 'pull_request':
-            handle_pull_request_event(data)
         elif event == 'push':
             handle_push_event(data)
         elif event == 'repository':
@@ -273,20 +271,6 @@ def handle_delete_event(data):
         print("CREATE")
         pprint(data)
         print("\n\n\n")
-
-
-def handle_pull_request_event(data):
-    # Filter bad words
-    for k in IGNORED_NICK_PARTS:
-        if k in data['pull_request']['user']['login']:
-            return
-    url = github_shortify(data['pull_request']['html_url'])
-    bot_say("{} [{}] {} {} pull request \"{}\": {}".format(COLOR_PREFIX,
-             data['repository']['name'],
-             data['pull_request']['user']['login'],
-             data['action'],
-             data['pull_request']['title'],
-             url))
 
 
 def handle_page_build(data):
